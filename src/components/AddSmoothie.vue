@@ -9,6 +9,7 @@
       <div v-for="(ing, index) in ingredients" class="field ingredient" :key="index">
         <label for="ingredient">Ingredient:</label>
         <input id="ingredient" type="text" name="ingredient" v-model="ingredients[index]">
+        <i class="material-icons delete" @click="deleteIng(ing)">delete</i>
       </div>
       <div class="field add-ingredient">
         <label for="add-ingredient">Add an ingredient:</label>
@@ -25,6 +26,8 @@
 </template>
 
 <script>
+import db from '@/firebase/init'
+import slugify from 'slugify'
   export default {
     name: 'AddSmoothie',
     data(){
@@ -32,12 +35,32 @@
         title: null,
         ingredients: [],
         another: null,
-        feedback: null
+        feedback: null,
+        slug: null
       }
     },
     methods: {
       addSmoothie(){
-        console.log(this.title)
+        if (this.title && this.ingredients.length > 0) {
+          this.feedback = null
+          this.slug = slugify(this.title, {
+            replacement: '-',
+            remove: /[$*_+~.()'"!\-:@]/g,
+            lower: true
+          })
+          db.collection('smoothies').add({
+            title: this.title,
+            ingredients: this.ingredients,
+            slug: this.slug
+          })
+          .then(() => {
+            this.$router.push({name: 'Index'})
+          }).catch(err => {
+            console.log(err)
+          })
+        } else {
+          this.feedback = 'You must have a title and atleast one ingredient!'
+        }
       },
       addIng () {
         if (this.another) {
@@ -47,6 +70,11 @@
         } else {
           this.feedback = 'You must enter a value to add an ingredient!'
         }
+      },
+      deleteIng (ing) {
+        this.ingredients = this.ingredients.filter(ingridient => {
+          return ingridient != ing
+        })
       }
     }
   }
@@ -64,5 +92,14 @@
   }
   .add-smoothie .field{
     margin: 20px auto;
+    position: relative;
+  }
+  .add-smoothie .delete{
+    position: absolute;
+    right: 0;
+    bottom: 16px;
+    color: #aaa;
+    font-size: 1.4em;
+    cursor: pointer;
   }
 </style>
