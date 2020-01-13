@@ -7,8 +7,8 @@
         <input id="title" type="text" name="title" v-model="title">
       </div>
       <div v-for="(ing, index) in ingredients" class="field ingredient" :key="index">
-        <label for="ingredient">Ingredient:</label>
-        <input id="ingredient" type="text" name="ingredient" v-model="ingredients[index]">
+        <label>Ingredient:</label>
+        <input type="text" name="ingredient" v-model="ingredients[index]">
         <i class="material-icons delete" @click="deleteIng(ing)">delete</i>
       </div>
       <div class="field add-ingredient">
@@ -28,6 +28,7 @@
 <script>
 import db from '@/firebase/init'
 import slugify from 'slugify'
+
   export default {
     name: 'AddSmoothie',
     data(){
