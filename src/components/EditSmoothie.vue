@@ -1,27 +1,32 @@
 <template>
-  <div v-if="smoothie" class="edit-smoothie container z-depth-1">
-    <h2>Edit {{ smoothie.title }} Smoothie</h2>
-    <form @submit.prevent="editSmoothie" @keydown.enter.prevent>
-      <div class="field title">
-        <label for="title">Smoothie title:</label>
-        <input id="title" type="text" name="title" v-model="smoothie.title">
-      </div>
-      <div v-for="(ing, index) in smoothie.ingredients" class="field ingredient" :key="index">
-        <label>Ingredient:</label>
-        <input type="text" name="ingredient" v-model="smoothie.ingredients[index]">
-        <i class="material-icons delete" @click="deleteIng(ing)">delete</i>
-      </div>
-      <div class="field add-ingredient">
-        <label for="add-ingredient">Add an ingredient:</label>
-        <input id="add-ingredient" type="text" name="add-ingredient"
-               @keydown.enter.prevent="addIng"
-               v-model="another">
-      </div>
-      <div class="field center-align">
-        <p class="red-text" v-if="feedback">{{feedback}}</p>
-        <button class="btn pink">Update Smoothie</button>
-      </div>
-    </form>
+  <div>
+    <div v-if="!smoothie" class="edit-smoothie container z-depth-1 loader-class">
+      <div class="loader"></div>
+    </div>
+    <div v-if="smoothie" class="edit-smoothie container z-depth-1">
+      <h2>Edit {{ smoothie.title }} Smoothie</h2>
+      <form @submit.prevent="editSmoothie" @keydown.enter.prevent>
+        <div class="field title">
+          <label for="title">Smoothie title:</label>
+          <input id="title" type="text" name="title" v-model="smoothie.title">
+        </div>
+        <div v-for="(ing, index) in smoothie.ingredients" class="field ingredient" :key="index">
+          <label>Ingredient:</label>
+          <input type="text" name="ingredient" v-model="smoothie.ingredients[index]">
+          <i class="material-icons delete" @click="deleteIng(ing)">delete</i>
+        </div>
+        <div class="field add-ingredient">
+          <label for="add-ingredient">Add an ingredient:</label>
+          <input id="add-ingredient" type="text" name="add-ingredient"
+                 @keydown.enter.prevent="addIng"
+                 v-model="another">
+        </div>
+        <div class="field center-align">
+          <p class="red-text" v-if="feedback">{{feedback}}</p>
+          <button class="btn pink">Update Smoothie</button>
+        </div>
+      </form>
+    </div>
   </div>
 </template>
 
@@ -39,12 +44,10 @@
       }
     },
     created () {
-      let ref = db.collection('smoothies').where('slug', '==', this.$route.params.smoothie_slug)
-      ref.get().then (snapshot => {
-        snapshot.forEach(doc => {
+      let ref = db.collection('smoothies').doc(this.$route.params.id)
+      ref.get().then (doc => {
           this.smoothie = doc.data()
           this.smoothie.id = doc.id
-        })
       })
     },
     methods: {
@@ -69,8 +72,7 @@
             title: this.smoothie.title,
             ingredients: this.smoothie.ingredients,
             slug: this.smoothie.slug
-          })
-            .then(() => {
+          }).then(() => {
               this.$router.push({name: 'Index'})
             }).catch(err => {
             console.log(err)
