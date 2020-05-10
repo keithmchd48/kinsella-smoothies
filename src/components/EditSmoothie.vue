@@ -1,7 +1,7 @@
 <template>
-  <div v-if="smoothie" class="edit-smoothie container">
+  <div v-if="smoothie" class="edit-smoothie container z-depth-1">
     <h2>Edit {{ smoothie.title }} Smoothie</h2>
-    <form @submit.prevent="editSmoothie">
+    <form @submit.prevent="editSmoothie" @keydown.enter.prevent>
       <div class="field title">
         <label for="title">Smoothie title:</label>
         <input id="title" type="text" name="title" v-model="smoothie.title">
@@ -14,7 +14,7 @@
       <div class="field add-ingredient">
         <label for="add-ingredient">Add an ingredient:</label>
         <input id="add-ingredient" type="text" name="add-ingredient"
-               @keydown.tab.prevent="addIng"
+               @keydown.enter.prevent="addIng"
                v-model="another">
       </div>
       <div class="field center-align">
