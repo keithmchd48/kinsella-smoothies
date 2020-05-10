@@ -1,20 +1,25 @@
 <template>
-  <div class="index container">
-    <div class="card" v-for="smoothie in smoothies" :key="smoothie.id">
-      <div class="card-content">
-        <i class="material-icons delete" @click="deleteSmoothie(smoothie.id)">delete</i>
-        <h2 class="indigo-text">{{ smoothie.title }}</h2>
-        <ul class="ingredients">
-          <li v-for="(ing, index) in smoothie.ingredients" :key="index">
-            <span class="chip">{{ ing }}</span>
-          </li>
-        </ul>
-      </div>
-      <span class="btn-floating btn-large halfway-fab pink">
+  <div>
+    <div v-if="loading" class="container loader-class">
+      <div class="loader"></div>
+    </div>
+    <div v-else class="index container">
+      <div class="card" v-for="smoothie in smoothies" :key="smoothie.id">
+        <div class="card-content">
+          <i class="material-icons delete" @click="deleteSmoothie(smoothie.id)">delete</i>
+          <h2 class="indigo-text">{{ smoothie.title }}</h2>
+          <ul class="ingredients">
+            <li v-for="(ing, index) in smoothie.ingredients" :key="index">
+              <span class="chip">{{ ing }}</span>
+            </li>
+          </ul>
+        </div>
+        <span class="btn-floating btn-large halfway-fab pink">
         <router-link :to="{ name: 'EditSmoothie', params: {smoothie_slug: smoothie.slug}}">
           <i class="material-icons edit">edit</i>
         </router-link>
       </span>
+      </div>
     </div>
   </div>
 </template>
@@ -25,13 +30,16 @@ export default {
   name: 'Index',
   data () {
     return {
-      smoothies: []
+      smoothies: [],
+      loading: false
     }
   },
   created() {
+    this.loading = true
     // fetch data from firestore
     db.collection('smoothies').get()
     .then(snapshot => {
+      this.loading = false
       // snapshot contains array of docs
       snapshot.forEach(doc => {
         this.smoothies.push({
@@ -58,7 +66,10 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style>
+<style scoped>
+  .container {
+    height: 100vh;
+  }
   .index{
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
@@ -83,5 +94,9 @@ export default {
     cursor: pointer;
     color: #aaa;
     font-size: 1.4em;
+    transition: color 0.5s ease;
+  }
+  .delete:hover {
+    color: #e91e63;
   }
 </style>
